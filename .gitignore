@@ -1,4 +1,5 @@
 /dict_price.pkl
 /API-KEY.txt
-save/*
+save/
 .idea/*
+__pycache__/*
