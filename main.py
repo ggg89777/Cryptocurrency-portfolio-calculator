@@ -15,137 +15,135 @@ delay = 5  # How many minutes should I wait before sending a request to the site
 # this is necessary so as not to use up the free limit (recommended more than 5 minutes)
 apy_key = 'None'
 
-def save():
-
-    """The function polls instances of the class and saves the values entered in entry to a file save_portfolio.pkl"""
-
-    dict_save = {}
-    for key in dict_id.keys():
-        value1 = dict_id[key].get()
-        value2 = dict_id[key].get2()
-        dict_save[key] = [value1, value2]
-
-    dill_dump('save/save_portfolio.pkl', dict_save)
-
-def load():
-
-    """Load save_portfolio.pkl"""
-
-    dict_save = dill_load('save/save_portfolio.pkl')
-
-    for key in dict_save.keys():
-        generate_field(root=root, dict_id=dict_id, calculate=calculate, load_file=True, key=key)
-        dict_id[key].push(dict_save[key][0], dict_save[key][1])
-
-def object_polling():
-
-    """The function polls instances of the class, generates one row and sends a request to coinmarketcap."""
-
-    result_str = ''
-
-    for key in dict_id.keys():
-        get_string = str(dict_id[key].get())
-        result_str = result_str + ',' + get_string
-
-    result_str = result_str[1:]
-    dict_price = generate_dict_price(result_str, apy_key)
-    dill_dump('dict_price.pkl', dict_price)
-    for key in dict_id.keys():
-        dict_id[key].config(text=str(dict_price[dict_id[key].get()]))
-
-
-def calculate():
-
-    """The function multiplies in a loop the prices received from the website by the number of
-     coins that are entered into the input field. Next it displays the total amount of money.
-     The coin prices are loaded from a previously saved dictionary dict_price.pkl"""
-
-    dict_price = dill_load('dict_price.pkl')
-    total_cash = 0
-
-    for key in dict_id.keys():
-        try:
-            price = str(dict_price[dict_id[key].get()])
-            cash = str(round(float(dict_price[dict_id[key].get()]) * float(dict_id[key].get2()), 2))
-            dict_id[key].config(price, cash)
-            total_cash += float(cash)
-        except Exception:
-            price = 0
-            cash = 0
-            dict_id[key].config(price, cash)
-            total_cash += float(cash)
-
-    total_label.config(text=str(int(total_cash)) + ' $')
-
-def auto_start():
-
-    """Function to automatically update prices and calculate the total portfolio amount
-    progress through the loop until the stop flag becomes true"""
-
-    global stop
-    stop = False
-
-    def start():
-        while not stop:
-            object_polling()
-            calculate()
-            print('start')
-            for i in range(1, delay*60):  # so that the start function breaks a second after pressing stop
-                if not stop:
-                    time.sleep(1)
-                else:
-                    break
-        print('stop')
-
-    Thread(None, start).start()  # runs in a separate thread so that the program does not hang while waiting
-
-def auto_stop():
-    global stop
-
-    """Stop function auto_start. Sets the flag to true when the user clicks the stop button."""
-
-    stop = True
-
-def show_delay_entry():
-    global delay
-
-    """dialog box for entering a delay"""
-
-    result = simpledialog.askinteger("Delay", "Enter delay (min):", parent=root, minvalue=5)
-
-    """if there is a value in the dialog box then the variable is equal to the entered value"""
-
-    if result is not None:
-        delay = result
-
-def show_entry_key():
-    global apy_key
-
-    """dialog box for entering a api key"""
-
-    result = simpledialog.askstring("API_KEY", "Enter API-KEY coinmarketcap.com:", parent=root)
-
-    """if there is a value in the dialog box then the variable is equal to the entered value"""
-
-    if result is not None:
-        apy_key = result
-        save_key(apy_key)
-
-def initial_key_check():
-
-    """When the program starts, the function reads the key from the file API-KEY.txt.
-     If no such file exists, prompts a dialog box to enter the key"""
-
-    global apy_key
-    try:
-        apy_key = read_key()
-    except:
-        show_entry_key()
-
-
-if __name__ == '__main__':
+def main():
 
     """Main program window module"""
+
+    def save():
+
+        """The function polls instances of the class and saves the values entered in entry to a file save_portfolio.pkl"""
+
+        dict_save = {}
+        for key in dict_id.keys():
+            value1 = dict_id[key].get()
+            value2 = dict_id[key].get2()
+            dict_save[key] = [value1, value2]
+
+        dill_dump('save/save_portfolio.pkl', dict_save)
+
+    def load():
+
+        """Load save_portfolio.pkl"""
+
+        dict_save = dill_load('save/save_portfolio.pkl')
+
+        for key in dict_save.keys():
+            generate_field(root=root, dict_id=dict_id, calculate=calculate, load_file=True, key=key)
+            dict_id[key].push(dict_save[key][0], dict_save[key][1])
+
+    def object_polling():
+
+        """The function polls instances of the class, generates one row and sends a request to coinmarketcap."""
+
+        result_str = ''
+
+        for key in dict_id.keys():
+            get_string = str(dict_id[key].get())
+            result_str = result_str + ',' + get_string
+
+        result_str = result_str[1:]
+        dict_price = generate_dict_price(result_str, apy_key)
+        dill_dump('dict_price.pkl', dict_price)
+        for key in dict_id.keys():
+            dict_id[key].config(text=str(dict_price[dict_id[key].get()]))
+
+    def calculate():
+
+        """The function multiplies in a loop the prices received from the website by the number of
+         coins that are entered into the input field. Next it displays the total amount of money.
+         The coin prices are loaded from a previously saved dictionary dict_price.pkl"""
+
+        dict_price = dill_load('dict_price.pkl')
+        total_cash = 0
+
+        for key in dict_id.keys():
+            try:
+                price = str(dict_price[dict_id[key].get()])
+                cash = str(round(float(dict_price[dict_id[key].get()]) * float(dict_id[key].get2()), 2))
+                dict_id[key].config(price, cash)
+                total_cash += float(cash)
+            except Exception:
+                price = 0
+                cash = 0
+                dict_id[key].config(price, cash)
+                total_cash += float(cash)
+
+        total_label.config(text=str(int(total_cash)) + ' $')
+
+    def auto_start():
+
+        """Function to automatically update prices and calculate the total portfolio amount
+        progress through the loop until the stop flag becomes true"""
+
+        global stop
+        stop = False
+
+        def start():
+            while not stop:
+                object_polling()
+                calculate()
+                print('start')
+                for i in range(1, delay * 60):  # so that the start function breaks a second after pressing stop
+                    if not stop:
+                        time.sleep(1)
+                    else:
+                        break
+            print('stop')
+
+        Thread(None, start).start()  # runs in a separate thread so that the program does not hang while waiting
+
+    def auto_stop():
+        global stop
+
+        """Stop function auto_start. Sets the flag to true when the user clicks the stop button."""
+
+        stop = True
+
+    def show_delay_entry():
+        global delay
+
+        """dialog box for entering a delay"""
+
+        result = simpledialog.askinteger("Delay", "Enter delay (min):", parent=root, minvalue=5)
+
+        """if there is a value in the dialog box then the variable is equal to the entered value"""
+
+        if result is not None:
+            delay = result
+
+    def show_entry_key():
+        global apy_key
+
+        """dialog box for entering a api key"""
+
+        result = simpledialog.askstring("API_KEY", "Enter API-KEY coinmarketcap.com:", parent=root)
+
+        """if there is a value in the dialog box then the variable is equal to the entered value"""
+
+        if result is not None:
+            apy_key = result
+            save_key(apy_key)
+
+    def initial_key_check():
+
+        """When the program starts, the function reads the key from the file API-KEY.txt.
+         If no such file exists, prompts a dialog box to enter the key"""
+
+        global apy_key
+        try:
+            apy_key = read_key()
+        except:
+            show_entry_key()
 
     root = Tk()  # main program window
     root.title('Cryptocurrency portfolio calculator')  # name
@@ -203,3 +201,6 @@ if __name__ == '__main__':
     root.config(menu=main_menu)
 
     root.mainloop()  # loop until the user closes the program
+
+if __name__ == '__main__':
+    main()
