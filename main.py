@@ -147,7 +147,7 @@ def main():
 
     root = Tk()  # main program window
     root.title('Cryptocurrency portfolio calculator')  # name
-    root.geometry('900x750')  # size
+    root.geometry('900x950')  # size
     button = Button(root, text='Get Coinmarketcap', command=object_polling)  # create a button in the root of the window
     button.grid(row=6, column=1, sticky=S, padx=8)  # show button in grid mode
 
