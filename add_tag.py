@@ -50,6 +50,13 @@ class CreateTag:
         if text2 is not None:
             self.new_label2.config(text=text2)
 
+    @staticmethod
+    def reindex(dict_0):  # Function to reindex a dictionary so that the indexes are in order
+        new_dict = {}
+        for i, value in enumerate(dict_0.values(), start=1):
+            new_dict[i] = value
+        return new_dict
+
     def del_coin(self):
         self.new_label.grid_forget()
         self.new_label2.grid_forget()
@@ -57,6 +64,7 @@ class CreateTag:
         self.new_entry2.grid_forget()
         self.del_button.grid_forget()
         del self.dict_id[self.idx]
+        self.dict_id = self.reindex(self.dict_id)  # replacing a dictionary in a class instance
         self.calculate()
 
 def counter(fu):

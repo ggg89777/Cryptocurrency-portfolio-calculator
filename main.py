@@ -5,7 +5,7 @@ from saving_files import dill_load, dill_dump, read_key, save_key
 
 from tkinter import simpledialog
 from threading import Thread
-from add_tag import generate_field
+from add_tag import generate_field, CreateTag
 from get_quotes import generate_dict_price
 
 
@@ -36,6 +36,7 @@ def main():
         """Load save_portfolio.pkl"""
 
         dict_save = dill_load('save/save_portfolio.pkl')
+        dict_save = CreateTag.reindex(dict_save)  # checking indexes when loading from a file
 
         for key in dict_save.keys():
             generate_field(root=root, dict_id=dict_id, calculate=calculate, load_file=True, key=key)
